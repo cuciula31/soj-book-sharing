@@ -46,11 +46,16 @@ public class User {
     private String email;
 
     @ManyToMany(targetEntity = Book.class, mappedBy = "users", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"users", "rentedFrom","rentedBook"})
     List<Book> ownedBooks;
 
-    @OneToMany(targetEntity = RentedBook.class ,mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(targetEntity = RentedBook.class, mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnoreProperties("user")
     Set<RentedBook> rentedBooks;
+
+    @OneToMany(targetEntity = RentedBook.class, mappedBy = "rentedFrom", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"users", "rentedFrom","rentedBook"})
+    Set<RentedBook> rentedTo = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -123,5 +128,13 @@ public class User {
 
     public void setRentedBooks(Set<RentedBook> rentedBooks) {
         this.rentedBooks = rentedBooks;
+    }
+
+    public Set<RentedBook> getRentedTo() {
+        return rentedTo;
+    }
+
+    public void setRentedTo(Set<RentedBook> rentedTo) {
+        this.rentedTo = rentedTo;
     }
 }

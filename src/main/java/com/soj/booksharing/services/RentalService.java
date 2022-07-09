@@ -31,6 +31,6 @@ public interface RentalService {
 //    List<Book> rentedBooksByUser(Long userId);
     List<Book> availableBooks();
 
-    List<UserDAO> whoRentedMyBooks(Long userId);
+//    List<String> whoRentedMyBooks(Long userId);
 
 }

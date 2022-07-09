@@ -16,15 +16,19 @@ public class RentedBook {
     private Long id;
 
     @ManyToOne()
-//    @JoinTable(name = "user_rental",
-//            joinColumns = @JoinColumn(name = "rent_id", referencedColumnName = "id"),
-//            inverseJoinColumns = @JoinColumn(name = "user_id",referencedColumnName = "id"))
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnoreProperties("rentedBooks")
     private User user;
 
+    @ManyToOne()
+    @JoinTable(name = "rented_from",
+            joinColumns = @JoinColumn(name = "rental_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
+    @JsonIgnoreProperties({"users", "rentedFrom","rentedBook","rentedTo"})
+    private User rentedFrom;
+
     @OneToOne
-    @JsonIgnoreProperties("rentedBook")
+    @JsonIgnoreProperties({"users", "rentedFrom","rentedBook","rentedTo"})
     private Book book;
 
     @Column(name = "start_date")
@@ -37,6 +41,15 @@ public class RentedBook {
     private Boolean wasExtended;
 
     public RentedBook() {
+    }
+
+    public RentedBook(User user, User rentedFrom, Book book, Date startDate, Date endDate, Boolean wasExtended) {
+        this.user = user;
+        this.rentedFrom = rentedFrom;
+        this.book = book;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.wasExtended = wasExtended;
     }
 
     public User getUser() {
@@ -87,5 +100,11 @@ public class RentedBook {
         return id;
     }
 
+    public User getRentedFrom() {
+        return rentedFrom;
+    }
 
+    public void setRentedFrom(User rentedFrom) {
+        this.rentedFrom = rentedFrom;
+    }
 }

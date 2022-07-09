@@ -72,6 +72,9 @@ public class UserController {
         return userService.rentedBooksByUser(userId);
     }
 
-
+    @GetMapping(value = "/{userId}/books/whorented")
+    public List<String> whoRentedFromMe(@PathVariable(value = "userId")Long userId){
+        return userService.whoRentedMyBooks(userId);
+    }
 
 }

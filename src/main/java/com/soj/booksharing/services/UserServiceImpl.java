@@ -1,5 +1,6 @@
 package com.soj.booksharing.services;
 
+import com.soj.booksharing.data.RentalUtils;
 import com.soj.booksharing.data.RentingIntervals;
 import com.soj.booksharing.entity.Book;
 import com.soj.booksharing.entity.RentedBook;
@@ -10,8 +11,10 @@ import com.soj.booksharing.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -95,43 +98,28 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String addNewBook(Book book, Long userId) {
-        User user = fetchUser(userId);
-        book.getUsers().add(user);
 
-        user.getOwnedBooks().add(book);
+        User user = fetchUser(userId);
+
+        if (booksRepository.findAll().stream().anyMatch(b -> b.getBookTitle().equals(book.getBookTitle()))) {
+            Book existentBook = booksRepository.findAll().stream().filter(b -> b.getBookTitle().equals(book.getBookTitle())).findFirst().get();
+            existentBook.getUsers().add(user);
+            user.getOwnedBooks().add(existentBook);
+            booksRepository.save(existentBook);
+        } else {
+            book.getUsers().add(user);
+            user.getOwnedBooks().add(book);
+            booksRepository.save(book);
+        }
 
         repository.save(user);
-        booksRepository.save(book);
 
         return "User with id: %s updated".formatted(userId);
     }
 
     @Override
     public String addRental(Long userId, Long bookId, Integer rentingPeriod) {
-        User user = fetchUser(userId);
-        Book book = booksRepository.getById(bookId);
-
-        if (rentalRepository.findAll().stream().map(RentedBook::getBook).toList().contains(book)){
-            return "We're sorry. Book with id: %s is already rented. You can add it on wishlist".formatted(bookId);
-        }else{
-            if (rentingPeriod>4){
-                return "You can select between 1 and 4, that's representing weeks of rental";
-            }else{
-                RentedBook rentedBook = new RentedBook();
-                rentedBook.setStartDate(RentingIntervals.getIntervalsForSpecificPeriod(rentingPeriod).getStartDate());
-                rentedBook.setEndDate(RentingIntervals.getIntervalsForSpecificPeriod(rentingPeriod).getStartDate());
-                rentedBook.setBook(book);
-                rentedBook.setUser(user);
-                user.getRentedBooks().add(rentedBook);
-                book.setRentedBook(rentedBook);
-                booksRepository.save(book);
-
-                rentalRepository.save(rentedBook);
-
-                repository.save(user);
-                return "You have rented successfully a book!";
-            }
-        }
+        return RentalUtils.checkIfSuccess(userId, bookId, rentingPeriod, repository, booksRepository, rentalRepository);
     }
 
     @Override
@@ -150,5 +138,20 @@ public class UserServiceImpl implements UserService {
         return book.getUsers();
     }
 
+    @Override
+    public List<String> whoRentedMyBooks(Long userId) {
+        User user = repository.findById(userId).get();
+        List<Book> books = rentalRepository.findAll().stream().map(RentedBook::getBook).filter(b -> b.getUsers().contains(user)).toList();
+        List<String> toBeReturned = new ArrayList<>();
+
+        books.forEach(book -> {
+            toBeReturned.add(book.getBookTitle() +
+                    " " + "is rented by " + book.getRentedBook().getUser().getName() + " " + book.getRentedBook().getUser().getSurname() +
+                    " until " + book.getRentedBook().getEndDate().toString());
+        });
+
+
+        return toBeReturned;
+    }
 
 }

@@ -7,6 +7,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -35,10 +36,10 @@ public class Book {
             inverseJoinColumns = @JoinColumn(name = "user_id",referencedColumnName = "id"))
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnoreProperties("ownedBooks")
-    private List<User> users;
+    private List<User> users = new ArrayList<>();
 
     @OneToOne(targetEntity = RentedBook.class, mappedBy = "book")
-    @JsonIgnoreProperties("book")
+    @JsonIgnoreProperties({"users", "rentedFrom","rentedBook", "book"})
     private RentedBook rentedBook;
 
     public Long getId() {

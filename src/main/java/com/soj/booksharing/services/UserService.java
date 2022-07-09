@@ -27,4 +27,6 @@ public interface UserService {
 
     List<Book> rentedBooksByUser(Long id);
     List<User> fetchAllUsersThatOwn(Long id);
+
+    List<String> whoRentedMyBooks(Long userId);
 }

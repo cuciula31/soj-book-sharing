@@ -54,4 +54,6 @@ public class RentalController {
     public List<Book> available(){
         return rentalService.availableBooks();
     }
+
+
 }

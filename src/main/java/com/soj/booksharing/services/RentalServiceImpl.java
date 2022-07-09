@@ -10,6 +10,7 @@ import com.soj.booksharing.repository.RentalRepository;
 import com.soj.booksharing.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -45,8 +46,6 @@ public class RentalServiceImpl implements RentalService {
     }
 
 
-
-
     @Override
     public String update(RentedBook rentedBook, Long id) {
         return null;
@@ -68,8 +67,5 @@ public class RentalServiceImpl implements RentalService {
         return allBooks;
     }
 
-    @Override
-    public List<UserDAO> whoRentedMyBooks(Long userId) {
-        return null;
-    }
+
 }
