@@ -3,6 +3,7 @@ package com.soj.booksharing.services;
 
 import com.soj.booksharing.entity.Book;
 import com.soj.booksharing.entity.User;
+import com.soj.booksharing.entity.Wishlist;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -23,10 +24,12 @@ public interface UserService {
 
     String addRental(Long userId, Long bookId, Integer rentInterval);
     String addNewBook(Book book, Long userId);
+    String addToWishlist(Long userId, Long bookId);
     List<Book> fetchOwnedBooks(Long id);
-
-    List<Book> rentedBooksByUser(Long id);
+    List<String> rentedBooksByUser(Long id);
     List<User> fetchAllUsersThatOwn(Long id);
-
     List<String> whoRentedMyBooks(Long userId);
+    List<Wishlist> wishListByUserId(Long userId);
+
+    String deleteWish(Long userId, Integer wish);
 }

@@ -1,26 +1,33 @@
 package com.soj.booksharing.services;
 
+import com.soj.booksharing.data.BookUtils;
+import com.soj.booksharing.data.RentalUtils;
+import com.soj.booksharing.data.StringFormatters;
 import com.soj.booksharing.entity.Book;
-import com.soj.booksharing.entity.User;
+
 import com.soj.booksharing.repository.BooksRepository;
+import com.soj.booksharing.repository.RentalRepository;
 import com.sun.istack.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+
 
 @Service
-public class BookServiceImpl implements BookService{
+public class BookServiceImpl implements BookService {
 
     private final BooksRepository booksRepository;
+    private final RentalRepository rentalRepository;
 
-    public BookServiceImpl(BooksRepository booksRepository) {
+    public BookServiceImpl(BooksRepository booksRepository, RentalRepository rentalRepository) {
         this.booksRepository = booksRepository;
+        this.rentalRepository = rentalRepository;
     }
 
     @Override
     public List<Book> fetchAll() {
-       return booksRepository.findAll();
+        return booksRepository.findAll();
     }
 
     @Override
@@ -31,47 +38,56 @@ public class BookServiceImpl implements BookService{
     @Override
     public String deleteById(Long id) {
         booksRepository.deleteById(id);
-        return "Book with id: %s deleted".formatted(id);
+        return StringFormatters.bookDeleted(id);
     }
 
     @Override
-    public String update(Book book,Long id) {
+    public String update(Book book, Long id) {
         Book toBeUpdated = booksRepository.findById(id).get();
 
-        if (Objects.nonNull(book.getBookTitle())
-                && !"".equalsIgnoreCase(
-                book.getBookTitle())) {
-            toBeUpdated.setBookTitle(
-                    book.getBookTitle());
-        }
-
-        if (Objects.nonNull(book.getAuthor())
-                && !"".equalsIgnoreCase(
-                book.getBookTitle())) {
-            toBeUpdated.setAuthor(
-                    book.getAuthor());
-        }
+        BookUtils.updateBook(book, toBeUpdated);
 
         booksRepository.save(toBeUpdated);
 
-        return "Book with id: %s updated".formatted(id);
+        return StringFormatters.bookUpdated(id);
 
     }
 
     @Override
     public String add(Book book) {
         booksRepository.save(book);
-        return "Book with id: %s added".formatted(book.getId());
+        return StringFormatters.bookAdded(book.getId());
     }
 
     @Override
-    public List<Book> booksWithTitle(String title) {
-        return booksRepository.findByBookTitleIgnoreCaseContaining(title);
+    public List<String> booksWithTitle(String title) {
+
+        List<String> toReturn = new ArrayList<>();
+
+        for (Book b : booksRepository.findByBookTitleIgnoreCaseContaining(title)) {
+            if (RentalUtils.checkIfAvailable(b.getId(), booksRepository, rentalRepository)) {
+                toReturn.add(StringFormatters.bookWithTitleIsAvailable(b));
+            } else {
+                toReturn.add(StringFormatters.bookWithTitleIsUnavailable(b));
+            }
+        }
+
+        return toReturn;
     }
 
     @Override
-    public List<Book> booksWithAuthor(String author) {
-        return booksRepository.findByAuthorIgnoreCaseContaining(author);
+    public List<String> booksWithAuthor(String author) {
+        List<String> toReturn = new ArrayList<>();
+
+        for (Book b : booksRepository.findByAuthorIgnoreCaseContaining(author)) {
+            if (RentalUtils.checkIfAvailable(b.getId(), booksRepository, rentalRepository)) {
+                toReturn.add(StringFormatters.bookWithTitleIsAvailable(b));
+            } else {
+                toReturn.add(StringFormatters.bookWithTitleIsUnavailable(b));
+            }
+        }
+
+        return toReturn;
     }
 
 

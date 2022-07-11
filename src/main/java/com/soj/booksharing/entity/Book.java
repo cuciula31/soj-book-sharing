@@ -38,9 +38,13 @@ public class Book {
     @JsonIgnoreProperties("ownedBooks")
     private List<User> users = new ArrayList<>();
 
-    @OneToOne(targetEntity = RentedBook.class, mappedBy = "book")
+    @OneToMany(targetEntity = RentedBook.class, mappedBy = "book")
     @JsonIgnoreProperties({"users", "rentedFrom","rentedBook", "book"})
-    private RentedBook rentedBook;
+    private List<RentedBook> rentedBook = new ArrayList<>();
+
+    @OneToMany(targetEntity = Wishlist.class, mappedBy = "book")
+    @JsonIgnoreProperties("book")
+    private List<Wishlist> wishlist = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -74,11 +78,19 @@ public class Book {
         this.users = users;
     }
 
-    public RentedBook getRentedBook() {
+    public List<RentedBook> getRentedBook() {
         return rentedBook;
     }
 
-    public void setRentedBook(RentedBook rentedBook) {
+    public void setRentedBook(List<RentedBook> rentedBook) {
         this.rentedBook = rentedBook;
+    }
+
+    public List<Wishlist> getWishlist() {
+        return wishlist;
+    }
+
+    public void setWishlist(List<Wishlist> wishlist) {
+        this.wishlist = wishlist;
     }
 }

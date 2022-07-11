@@ -12,7 +12,7 @@ public interface BookService {
     String update( Book book, Long id);
     String add(Book book);
 
-    List<Book> booksWithTitle(String title);
-    List<Book> booksWithAuthor(String author);
+    List<String> booksWithTitle(String title);
+    List<String> booksWithAuthor(String author);
 
 }

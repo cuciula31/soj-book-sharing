@@ -27,7 +27,7 @@ public class RentedBook {
     @JsonIgnoreProperties({"users", "rentedFrom","rentedBook","rentedTo"})
     private User rentedFrom;
 
-    @OneToOne
+    @ManyToOne
     @JsonIgnoreProperties({"users", "rentedFrom","rentedBook","rentedTo"})
     private Book book;
 

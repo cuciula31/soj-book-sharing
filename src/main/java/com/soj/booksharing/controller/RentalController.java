@@ -34,12 +34,6 @@ public class RentalController {
         return rentalService.addNew(rentedBook);
     }
 
-//    @PostMapping(value = "/user/{userId}/book/{bookId}")
-//    public String add(@PathVariable(value = "userId") Long userId,
-//                      @PathVariable(value = "bookId") Long bookId, @RequestBody RentingIntervals rentingIntervals){
-//        return rentalService.addNew(bookId,userId,rentingIntervals);
-//    }
-
     @PutMapping(value = "/{id}")
     public String update(@RequestBody RentedBook rentedBook, @PathVariable(value = "id") Long id){
         return rentalService.update(rentedBook, id);
@@ -51,9 +45,13 @@ public class RentalController {
     }
 
     @GetMapping(value = "/available")
-    public List<Book> available(){
+    public List<String> available(){
         return rentalService.availableBooks();
     }
 
 
+    @PutMapping(value = "/{id}/extend")
+    public String extendEndDate(@PathVariable(value = "id")Long id){
+       return rentalService.extend(id);
+    }
 }

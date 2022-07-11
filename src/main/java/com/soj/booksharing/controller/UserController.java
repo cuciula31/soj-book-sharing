@@ -2,7 +2,9 @@ package com.soj.booksharing.controller;
 
 import com.soj.booksharing.entity.Book;
 import com.soj.booksharing.entity.User;
+import com.soj.booksharing.entity.Wishlist;
 import com.soj.booksharing.services.UserService;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,7 +41,7 @@ public class UserController {
 
     @PutMapping(value = "/{id}")
     public String update(@RequestBody User user ,@PathVariable("id") Long id){
-        return "";
+        return userService.update(user, id);
     }
 
     @GetMapping(value = "/{id}/books")
@@ -68,13 +70,28 @@ public class UserController {
     }
 
     @GetMapping(value = "/{userId}/books/rented")
-    public List<Book> rentedBooks(@PathVariable(value = "userId")Long userId){
+    public List<String> rentedBooks(@PathVariable(value = "userId")Long userId){
         return userService.rentedBooksByUser(userId);
     }
 
     @GetMapping(value = "/{userId}/books/whorented")
     public List<String> whoRentedFromMe(@PathVariable(value = "userId")Long userId){
         return userService.whoRentedMyBooks(userId);
+    }
+
+    @GetMapping(value = "/{userId}/wishlist")
+    public List<Wishlist> getWishlistWhereUserIs(@PathVariable(value = "userId")Long userId){
+        return userService.wishListByUserId(userId);
+    }
+
+    @PutMapping(value = "/{userId}/books/{bookId}/addtowishlist")
+    public String addToWishlist(@PathVariable(value = "userId")Long userId, @PathVariable(value = "bookId")Long bookId){
+        return userService.addToWishlist(userId,bookId);
+    }
+
+    @PutMapping(value = "/{userId}/wishlist/remove/{wishId}")
+    public String removeFromWishList(@PathVariable(value = "userId") Long userId, @PathVariable(value = "wishId")Integer wishId){
+        return userService.deleteWish(userId, wishId);
     }
 
 }

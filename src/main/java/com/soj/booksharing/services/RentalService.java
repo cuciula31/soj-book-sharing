@@ -29,8 +29,9 @@ public interface RentalService {
 
     //Read books
 //    List<Book> rentedBooksByUser(Long userId);
-    List<Book> availableBooks();
+    List<String> availableBooks();
 
 //    List<String> whoRentedMyBooks(Long userId);
 
+    String extend( Long id);
 }

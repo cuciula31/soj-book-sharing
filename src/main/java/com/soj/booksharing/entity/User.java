@@ -46,7 +46,7 @@ public class User {
     private String email;
 
     @ManyToMany(targetEntity = Book.class, mappedBy = "users", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnoreProperties({"users", "rentedFrom","rentedBook"})
+    @JsonIgnoreProperties({"users", "rentedFrom", "rentedBook"})
     List<Book> ownedBooks;
 
     @OneToMany(targetEntity = RentedBook.class, mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -54,8 +54,12 @@ public class User {
     Set<RentedBook> rentedBooks;
 
     @OneToMany(targetEntity = RentedBook.class, mappedBy = "rentedFrom", fetch = FetchType.LAZY)
-    @JsonIgnoreProperties({"users", "rentedFrom","rentedBook"})
+    @JsonIgnoreProperties({"users", "rentedFrom", "rentedBook"})
     Set<RentedBook> rentedTo = new HashSet<>();
+
+    @OneToMany(targetEntity = Wishlist.class, mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("user")
+    Set<Wishlist> wishlist = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -136,5 +140,13 @@ public class User {
 
     public void setRentedTo(Set<RentedBook> rentedTo) {
         this.rentedTo = rentedTo;
+    }
+
+    public Set<Wishlist> getWishlist() {
+        return wishlist;
+    }
+
+    public void setWishlist(Set<Wishlist> wishlist) {
+        this.wishlist = wishlist;
     }
 }

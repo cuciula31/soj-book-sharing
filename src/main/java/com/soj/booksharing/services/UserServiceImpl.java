@@ -1,33 +1,36 @@
 package com.soj.booksharing.services;
 
-import com.soj.booksharing.data.RentalUtils;
-import com.soj.booksharing.data.RentingIntervals;
+import com.soj.booksharing.data.*;
 import com.soj.booksharing.entity.Book;
 import com.soj.booksharing.entity.RentedBook;
 import com.soj.booksharing.entity.User;
+import com.soj.booksharing.entity.Wishlist;
 import com.soj.booksharing.repository.BooksRepository;
 import com.soj.booksharing.repository.RentalRepository;
 import com.soj.booksharing.repository.UserRepository;
+import com.soj.booksharing.repository.WishlistRepository;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository repository;
     private final BooksRepository booksRepository;
-
     private final RentalRepository rentalRepository;
+    private final WishlistRepository wishlistRepository;
 
-    public UserServiceImpl(UserRepository repository, BooksRepository booksRepository, RentalRepository rentalRepository) {
+    public UserServiceImpl(UserRepository repository, BooksRepository booksRepository, RentalRepository rentalRepository, WishlistRepository wishlistRepository) {
         this.repository = repository;
         this.booksRepository = booksRepository;
         this.rentalRepository = rentalRepository;
+        this.wishlistRepository = wishlistRepository;
     }
 
     @Override
@@ -43,48 +46,29 @@ public class UserServiceImpl implements UserService {
     @Override
     public String deleteUser(Long id) {
         repository.deleteById(id);
-        return "User with id: %s deleted".formatted(id);
+        return StringFormatters.userDeleted(id);
     }
 
     public String update(User user, Long id) {
+
         User toBeUpdated = repository.findById(id).get();
-
-        if (Objects.nonNull(user.getName()) && !"".equalsIgnoreCase(user.getName())) {
-            toBeUpdated.setName(user.getName());
-        }
-
-        if (Objects.nonNull(user.getSurname()) && !"".equalsIgnoreCase(user.getSurname())) {
-            toBeUpdated.setSurname(user.getSurname());
-        }
-
-        if (Objects.nonNull(user.getUser()) && !"".equalsIgnoreCase(user.getUser())) {
-            toBeUpdated.setUser(user.getUser());
-        }
-
-        if (Objects.nonNull(user.getEmail()) && !"".equalsIgnoreCase(user.getEmail())) {
-            toBeUpdated.setEmail(user.getEmail());
-        }
-
-        if (Objects.nonNull(user.getPassword()) && !"".equalsIgnoreCase(user.getPassword())) {
-            toBeUpdated.setPassword(user.getPassword());
-        }
-
+        UserUtils.userUpdate(user, toBeUpdated);
         repository.save(toBeUpdated);
 
-        return "User with id: %s updated".formatted(id);
+        return StringFormatters.userUpdated(id);
 
     }
 
     @Override
     public String add(User user) {
         repository.save(user);
-        return "User with id: %s added".formatted(user.getId());
+        return StringFormatters.userAdded(user.getId());
     }
 
     @Override
     public String addExistingBook(Long userId, Long bookId) {
         User user = fetchUser(userId);
-        Book book = booksRepository.getById(bookId);
+        Book book = BookUtils.getById(bookId, booksRepository);
 
         user.getOwnedBooks().add(book);
         book.getUsers().add(user);
@@ -92,7 +76,7 @@ public class UserServiceImpl implements UserService {
         repository.save(user);
         booksRepository.save(book);
 
-        return "User with id: %s updated".formatted(userId);
+        return StringFormatters.userUpdated(userId);
     }
 
 
@@ -114,7 +98,37 @@ public class UserServiceImpl implements UserService {
 
         repository.save(user);
 
-        return "User with id: %s updated".formatted(userId);
+        return StringFormatters.userUpdated(userId);
+    }
+
+    @Override
+    public String addToWishlist(Long userId, Long bookId) {
+        User user = fetchUser(userId);
+        Book book = BookUtils.getById(bookId, booksRepository);
+
+        if (WishlistUtils.isAlready(bookId, fetchUser(userId).getWishlist().stream().toList(), booksRepository)) {
+            return StringFormatters.bookFailedToAdd(book);
+        } else {
+            Wishlist wishlist = new Wishlist();
+
+            user.getWishlist().add(wishlist);
+            book.getWishlist().add(wishlist);
+
+            wishlist.setUser(user);
+            wishlist.setBook(book);
+
+             if (RentalUtils.checkIfAvailable(bookId,booksRepository,rentalRepository)){
+                 wishlist.setEstimatedDate(Date.from(LocalDate.now().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+             }else{
+                 wishlist.setEstimatedDate(book.getRentedBook().get(0).getEndDate());
+             }
+
+            repository.save(user);
+            booksRepository.save(book);
+            wishlistRepository.save(wishlist);
+
+            return StringFormatters.bookAddedToWishList(book);
+        }
     }
 
     @Override
@@ -128,9 +142,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Book> rentedBooksByUser(Long id) {
-        return repository.findById(id).get().getRentedBooks().stream().map(RentedBook::getBook).toList();
+    public List<String> rentedBooksByUser(Long id) {
+        List<String> toBeReturned = new ArrayList<>();
+        fetchUser(id).getRentedBooks().forEach(r -> {
+            toBeReturned.add(StringFormatters.rental(r));
+        });
+        return toBeReturned;
     }
+
 
     @Override
     public List<User> fetchAllUsersThatOwn(Long id) {
@@ -141,17 +160,37 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<String> whoRentedMyBooks(Long userId) {
         User user = repository.findById(userId).get();
-        List<Book> books = rentalRepository.findAll().stream().map(RentedBook::getBook).filter(b -> b.getUsers().contains(user)).toList();
         List<String> toBeReturned = new ArrayList<>();
 
-        books.forEach(book -> {
-            toBeReturned.add(book.getBookTitle() +
-                    " " + "is rented by " + book.getRentedBook().getUser().getName() + " " + book.getRentedBook().getUser().getSurname() +
-                    " until " + book.getRentedBook().getEndDate().toString());
-        });
+        List<RentedBook> rentedBooks = rentalRepository.findAll().stream().filter(rb -> rb.getRentedFrom().equals(user)).toList();
 
+        for (RentedBook rentedBook : rentedBooks) {
+            toBeReturned.add(StringFormatters.whoRentedFromMe(rentedBook));
+        }
 
         return toBeReturned;
     }
 
+    @Override
+    public List<Wishlist> wishListByUserId(Long userId) {
+        return fetchUser(userId).getWishlist().stream().toList();
+    }
+
+    @Override
+    public String deleteWish(Long userId, Integer wish){
+        User user = fetchUser(userId);
+        List<Wishlist> wishlist = new ArrayList<>(user.getWishlist().stream().toList());
+        if (wish > wishlist.size()){
+            return StringFormatters.wishRemovalFailed();
+        }else{
+            Wishlist wishToRemove = wishlist.get(wish);
+            Book book = wishToRemove.getBook();
+            book.getWishlist().remove(wishToRemove);
+            wishlistRepository.delete(wishToRemove);
+            wishlist.remove(wish.intValue());
+            repository.save(user);
+            booksRepository.save(book);
+            return StringFormatters.wishRemoved(book);
+        }
+    }
 }

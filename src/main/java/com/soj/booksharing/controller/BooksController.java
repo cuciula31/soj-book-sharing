@@ -29,13 +29,13 @@ public class BooksController {
         return bookService.fetchById(id);
     }
 
-    @GetMapping("/title")
-    public List<Book> getByName(@RequestBody  String title){
+    @GetMapping("/title/{title}")
+    public List<String> getByName(@PathVariable(value = "title")  String title){
         return bookService.booksWithTitle(title);
     }
 
-    @GetMapping("/author")
-    public List<Book> getByAuthor(@RequestBody  String author){
+    @GetMapping("/author/{author}")
+    public List<String> getByAuthor(@PathVariable(value = "author")  String author){
         return bookService.booksWithAuthor(author);
     }
 
@@ -51,7 +51,7 @@ public class BooksController {
 
     @PutMapping(value = "/{id}")
     public String update(@RequestBody Book book, @PathVariable("id") Long id){
-        return "";
+        return bookService.update(book,id);
     }
 
 
