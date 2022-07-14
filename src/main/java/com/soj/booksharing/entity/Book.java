@@ -7,6 +7,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,10 +25,10 @@ public class Book {
     }
 
     @Column(name = "book_title")
-    @NotNull
+    @Size(min = 2, max = 50, message = "Book title length must be between 2 (min) and 50 (max)")
     private String bookTitle;
     @Column(name = "author")
-    @NotNull
+    @Size(min = 2, max = 30, message = "Book author length must be between 2 (min) and 30 (max)")
     private String author;
 
     @ManyToMany()

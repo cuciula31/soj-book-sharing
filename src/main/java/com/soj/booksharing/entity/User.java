@@ -30,19 +30,15 @@ public class User {
 
     private @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
-    @NotBlank
-    @Size(min = 2, max = 30)
+    @Size(min = 2, max = 30, message = "Name length must be between 2 (min) and 30 (max)")
     private String name;
-    @NotNull
-
+    @Size(min = 2, max = 30, message = "Surname length must be between 2 (min) and 30 (max)")
     private String surname;
-    @NotNull
-    @Size(min = 2, max = 30)
+    @Size(min = 2, max = 10, message = "Username length must be between 2 (min) and 10 (max)")
     private String userName;
-    @NotNull
-    @Size(min = 7, max = 30)
+    @Size(min = 7, max = 30, message = "Surname length must be between 2 (min) and 30 (max)")
     private String password;
-    //@NotNull
+    @Size(min = 5, max = 30, message = "Email length must be between 5 (min) and 30 (max)")
     private String email;
 
     @ManyToMany(targetEntity = Book.class, mappedBy = "users", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

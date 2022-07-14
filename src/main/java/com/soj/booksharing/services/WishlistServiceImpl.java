@@ -2,6 +2,8 @@ package com.soj.booksharing.services;
 
 import com.soj.booksharing.entity.Wishlist;
 import com.soj.booksharing.repository.WishlistRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,12 +19,17 @@ public class WishlistServiceImpl implements WishlistService{
 
 
     @Override
-    public List<Wishlist> allWishes() {
-       return wishlistRepository.findAll();
+    public ResponseEntity<List<Wishlist>> allWishes() {
+       return ResponseEntity.ok(wishlistRepository.findAll());
     }
 
     @Override
-    public Wishlist wishById(Long id) {
-        return wishlistRepository.findById(id).get();
+    public ResponseEntity<Wishlist> wishById(Long id) {
+
+        if (wishlistRepository.findById(id).isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return ResponseEntity.ok(wishlistRepository.findById(id).get());
     }
 }

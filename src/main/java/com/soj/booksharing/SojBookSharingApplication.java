@@ -11,11 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@SpringBootApplication
+//@SpringBootApplication
+@SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 public class SojBookSharingApplication implements CommandLineRunner {
 
     @Autowired
@@ -33,36 +35,6 @@ public class SojBookSharingApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-
-//        User user = new User();
-//        user.setUser("Cuciula31");
-//        user.setName("Cuciula");
-//        user.setSurname("Sebastian");
-//        user.setPassword("1750607");
-//        user.setEmail("cuciula31@gmail.com");
-//
-//        List<Book> list = new ArrayList<>();
-//
-//        Book book = new Book();
-//        book.setBookTitle("Carte");
-//        book.setAuthor("Autor");
-////        book.getUsers().add();
-//        list.add(book);
-////        user.setOwnedBooks(list);
-//
-//        RentedBook rentedBook = new RentedBook();
-//        rentedBook.setUser(user);
-//
-//
-//        user.getRentedBooks().add(rentedBook);
-//        rentedBook.setBook(book);
-//        userService.add(user);
-//
-//        bookService.add(book);
-//
-//        rentalService.addNew(rentedBook);
-////        userService.add(user);
-
     }
 
 }

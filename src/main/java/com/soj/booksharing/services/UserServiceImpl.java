@@ -9,6 +9,8 @@ import com.soj.booksharing.repository.BooksRepository;
 import com.soj.booksharing.repository.RentalRepository;
 import com.soj.booksharing.repository.UserRepository;
 import com.soj.booksharing.repository.WishlistRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
@@ -34,40 +36,58 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User fetchUser(@NotNull Long id) {
-        return repository.findById(id).get();
+    public ResponseEntity<User> fetchUser(@NotNull Long id) {
+           if (repository.findById(id).isPresent()){
+               return ResponseEntity.ok(repository.findById(id).get());
+           }else{
+               return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+           }
+
     }
 
     @Override
-    public List<User> fetchAllUsers() {
-        return repository.findAll();
+    public ResponseEntity<List<User>> fetchAllUsers() {
+        return ResponseEntity.ok(repository.findAll());
     }
 
     @Override
-    public String deleteUser(Long id) {
+    public ResponseEntity<String> deleteUser(Long id) {
+        if (repository.findById(id).isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         repository.deleteById(id);
-        return StringFormatters.userDeleted(id);
+        return ResponseEntity.ok(StringFormatters.userDeleted(id));
     }
 
-    public String update(User user, Long id) {
+    public ResponseEntity<String> update(User user, Long id) {
+
+        if (repository.findById(id).isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
         User toBeUpdated = repository.findById(id).get();
         UserUtils.userUpdate(user, toBeUpdated);
         repository.save(toBeUpdated);
 
-        return StringFormatters.userUpdated(id);
+        return ResponseEntity.ok(StringFormatters.userUpdated(id));
 
     }
 
     @Override
-    public String add(User user) {
+    public ResponseEntity<String> add(User user) {
         repository.save(user);
-        return StringFormatters.userAdded(user.getId());
+        return ResponseEntity.ok(StringFormatters.userAdded(user.getId()));
     }
 
     @Override
-    public String addExistingBook(Long userId, Long bookId) {
-        User user = fetchUser(userId);
+    public ResponseEntity<String> addExistingBook(Long userId, Long bookId) {
+
+        if (repository.findById(userId).isEmpty() || booksRepository.findById(bookId).isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+
+        User user = fetchUser(userId).getBody();
         Book book = BookUtils.getById(bookId, booksRepository);
 
         user.getOwnedBooks().add(book);
@@ -76,17 +96,19 @@ public class UserServiceImpl implements UserService {
         repository.save(user);
         booksRepository.save(book);
 
-        return StringFormatters.userUpdated(userId);
+        return ResponseEntity.ok(StringFormatters.userUpdated(userId));
     }
 
 
     @Override
-    public String addNewBook(Book book, Long userId) {
+    public ResponseEntity<String> addNewBook(Book book, Long userId) {
 
-        User user = fetchUser(userId);
+        User user = fetchUser(userId).getBody();
 
         if (booksRepository.findAll().stream().anyMatch(b -> b.getBookTitle().equals(book.getBookTitle()))) {
-            Book existentBook = booksRepository.findAll().stream().filter(b -> b.getBookTitle().equals(book.getBookTitle())).findFirst().get();
+            Book existentBook = booksRepository.findAll().stream()
+                    .filter(b -> b.getBookTitle().equals(book.getBookTitle()))
+                    .findFirst().get(); //If book already found by stream is not necessary to verify ifPresent
             existentBook.getUsers().add(user);
             user.getOwnedBooks().add(existentBook);
             booksRepository.save(existentBook);
@@ -98,16 +120,16 @@ public class UserServiceImpl implements UserService {
 
         repository.save(user);
 
-        return StringFormatters.userUpdated(userId);
+        return ResponseEntity.ok(StringFormatters.userUpdated(userId));
     }
 
     @Override
-    public String addToWishlist(Long userId, Long bookId) {
-        User user = fetchUser(userId);
+    public ResponseEntity<String> addToWishlist(Long userId, Long bookId) {
+        User user = fetchUser(userId).getBody();
         Book book = BookUtils.getById(bookId, booksRepository);
 
-        if (WishlistUtils.isAlready(bookId, fetchUser(userId).getWishlist().stream().toList(), booksRepository)) {
-            return StringFormatters.bookFailedToAdd(book);
+        if (WishlistUtils.isAlready(bookId, fetchUser(userId).getBody().getWishlist().stream().toList(), booksRepository)) {
+            return new ResponseEntity<>(HttpStatus.ALREADY_REPORTED); //StringFormatters.bookFailedToAdd(book);
         } else {
             Wishlist wishlist = new Wishlist();
 
@@ -127,38 +149,38 @@ public class UserServiceImpl implements UserService {
             booksRepository.save(book);
             wishlistRepository.save(wishlist);
 
-            return StringFormatters.bookAddedToWishList(book);
+            return ResponseEntity.ok(StringFormatters.bookAddedToWishList(book));
         }
     }
 
     @Override
-    public String addRental(Long userId, Long bookId, Integer rentingPeriod) {
-        return RentalUtils.checkIfSuccess(userId, bookId, rentingPeriod, repository, booksRepository, rentalRepository);
+    public ResponseEntity<String> addRental(Long userId, Long bookId, Integer rentingPeriod) {
+        return ResponseEntity.ok(RentalUtils.checkIfSuccess(userId, bookId, rentingPeriod, repository, booksRepository, rentalRepository));
     }
 
     @Override
-    public List<Book> fetchOwnedBooks(Long id) {
-        return fetchUser(id).getOwnedBooks();
+    public ResponseEntity<List<Book>> fetchOwnedBooks(Long id) {
+        return ResponseEntity.ok(fetchUser(id).getBody().getOwnedBooks());
     }
 
     @Override
-    public List<String> rentedBooksByUser(Long id) {
+    public ResponseEntity<List<String>> rentedBooksByUser(Long id) {
         List<String> toBeReturned = new ArrayList<>();
-        fetchUser(id).getRentedBooks().forEach(r -> {
+        fetchUser(id).getBody().getRentedBooks().forEach(r -> {
             toBeReturned.add(StringFormatters.rental(r));
         });
-        return toBeReturned;
+        return ResponseEntity.ok(toBeReturned);
     }
 
 
     @Override
-    public List<User> fetchAllUsersThatOwn(Long id) {
+    public ResponseEntity<List<User>> fetchAllUsersThatOwn(Long id) {
         Book book = booksRepository.getById(id);
-        return book.getUsers();
+        return ResponseEntity.ok(book.getUsers());
     }
 
     @Override
-    public List<String> whoRentedMyBooks(Long userId) {
+    public ResponseEntity<List<String>> whoRentedMyBooks(Long userId) {
         User user = repository.findById(userId).get();
         List<String> toBeReturned = new ArrayList<>();
 
@@ -168,20 +190,20 @@ public class UserServiceImpl implements UserService {
             toBeReturned.add(StringFormatters.whoRentedFromMe(rentedBook));
         }
 
-        return toBeReturned;
+        return ResponseEntity.ok(toBeReturned) ;
     }
 
     @Override
-    public List<Wishlist> wishListByUserId(Long userId) {
-        return fetchUser(userId).getWishlist().stream().toList();
+    public ResponseEntity<List<Wishlist>> wishListByUserId(Long userId) {
+        return ResponseEntity.ok(fetchUser(userId).getBody().getWishlist().stream().toList());
     }
 
     @Override
-    public String deleteWish(Long userId, Integer wish){
-        User user = fetchUser(userId);
+    public ResponseEntity<String> deleteWish(Long userId, Integer wish){
+        User user = fetchUser(userId).getBody();
         List<Wishlist> wishlist = new ArrayList<>(user.getWishlist().stream().toList());
         if (wish > wishlist.size()){
-            return StringFormatters.wishRemovalFailed();
+            return ResponseEntity.ok(StringFormatters.wishRemovalFailed());
         }else{
             Wishlist wishToRemove = wishlist.get(wish);
             Book book = wishToRemove.getBook();
@@ -190,7 +212,7 @@ public class UserServiceImpl implements UserService {
             wishlist.remove(wish.intValue());
             repository.save(user);
             booksRepository.save(book);
-            return StringFormatters.wishRemoved(book);
+            return ResponseEntity.ok(StringFormatters.wishRemoved(book));
         }
     }
 }

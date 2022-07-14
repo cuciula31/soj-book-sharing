@@ -88,4 +88,8 @@ public class StringFormatters {
     public static String wishRemoved(Book b){
         return b.getBookTitle() + " by " + b.getAuthor() + " has been removed from your wishlist";
     }
+
+    public static String itemWithIdNotFound(Long id){
+        return "Item with id %s not found".formatted(id);
+    }
 }

@@ -1,18 +1,19 @@
 package com.soj.booksharing.services;
 
 import com.soj.booksharing.entity.Book;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface BookService {
 
-    List<Book> fetchAll();
-    Book fetchById(Long id);
-    String deleteById(Long id);
-    String update( Book book, Long id);
-    String add(Book book);
+    ResponseEntity<List<Book>> fetchAll();
+    ResponseEntity<Book> fetchById(Long id);
+    ResponseEntity<String> deleteById(Long id);
+    ResponseEntity<String> update( Book book, Long id);
+    ResponseEntity<String> add(Book book);
 
-    List<String> booksWithTitle(String title);
-    List<String> booksWithAuthor(String author);
+    ResponseEntity<List<String>> booksWithTitle(String title);
+    ResponseEntity<List<String>> booksWithAuthor(String author);
 
 }

@@ -2,6 +2,7 @@ package com.soj.booksharing.controller;
 
 import com.soj.booksharing.entity.Wishlist;
 import com.soj.booksharing.services.WishlistService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,12 +22,12 @@ public class WishlistController {
     }
 
     @GetMapping
-    public List<Wishlist> all(){
+    public ResponseEntity<List<Wishlist>> all(){
         return wishlistService.allWishes();
     }
 
     @GetMapping(value = "/{id}")
-    public Wishlist findById(@PathVariable(value = "id")Long id){
+    public ResponseEntity<Wishlist> findById(@PathVariable(value = "id")Long id){
       return wishlistService.wishById(id);
 
     }

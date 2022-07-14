@@ -4,6 +4,7 @@ package com.soj.booksharing.services;
 import com.soj.booksharing.entity.Book;
 import com.soj.booksharing.entity.User;
 import com.soj.booksharing.entity.Wishlist;
+import org.springframework.http.ResponseEntity;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -12,24 +13,20 @@ public interface UserService {
 
 
 
-    User fetchUser(@NotNull Long id);
+    ResponseEntity<User> fetchUser(@NotNull Long id);
+    ResponseEntity<List<User>> fetchAllUsers();
+    ResponseEntity<String> deleteUser(Long id);
+    ResponseEntity<String> update(User user,Long id);
+    ResponseEntity<String> add(User user);
+    ResponseEntity<String> addExistingBook(Long userId, Long bookId);
+    ResponseEntity<String> addRental(Long userId, Long bookId, Integer rentInterval);
+    ResponseEntity<String> addNewBook(Book book, Long userId);
+    ResponseEntity<String> addToWishlist(Long userId, Long bookId);
+    ResponseEntity<List<Book>> fetchOwnedBooks(Long id);
+    ResponseEntity<List<String>> rentedBooksByUser(Long id);
+    ResponseEntity<List<User>> fetchAllUsersThatOwn(Long id);
+    ResponseEntity<List<String>> whoRentedMyBooks(Long userId);
+    ResponseEntity<List<Wishlist>> wishListByUserId(Long userId);
 
-    List<User> fetchAllUsers();
-
-    String deleteUser(Long id);
-
-    String update(User user,Long id);
-    String add(User user);
-    String addExistingBook(Long userId, Long bookId);
-
-    String addRental(Long userId, Long bookId, Integer rentInterval);
-    String addNewBook(Book book, Long userId);
-    String addToWishlist(Long userId, Long bookId);
-    List<Book> fetchOwnedBooks(Long id);
-    List<String> rentedBooksByUser(Long id);
-    List<User> fetchAllUsersThatOwn(Long id);
-    List<String> whoRentedMyBooks(Long userId);
-    List<Wishlist> wishListByUserId(Long userId);
-
-    String deleteWish(Long userId, Integer wish);
+    ResponseEntity<String> deleteWish(Long userId, Integer wish);
 }

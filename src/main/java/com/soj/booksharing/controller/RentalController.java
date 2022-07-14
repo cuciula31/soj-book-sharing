@@ -1,9 +1,8 @@
 package com.soj.booksharing.controller;
 
-import com.soj.booksharing.data.RentingIntervals;
-import com.soj.booksharing.entity.Book;
 import com.soj.booksharing.entity.RentedBook;
 import com.soj.booksharing.services.RentalService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,38 +19,38 @@ public class RentalController {
     }
 
     @GetMapping
-    public List<RentedBook> all(){
+    public ResponseEntity<List<RentedBook>> all(){
         return rentalService.fetchAll();
     }
 
     @GetMapping(value = "/{id}")
-    public RentedBook getById(@PathVariable(value = "id") Long id){
+    public ResponseEntity<RentedBook> getById(@PathVariable(value = "id") Long id){
         return rentalService.fetchById(id);
     }
 
     @PostMapping
-    public String add(@RequestBody RentedBook rentedBook){
+    public ResponseEntity<String> add(@RequestBody RentedBook rentedBook){
         return rentalService.addNew(rentedBook);
     }
 
     @PutMapping(value = "/{id}")
-    public String update(@RequestBody RentedBook rentedBook, @PathVariable(value = "id") Long id){
+    public ResponseEntity<String> update(@RequestBody RentedBook rentedBook, @PathVariable(value = "id") Long id){
         return rentalService.update(rentedBook, id);
     }
 
     @DeleteMapping(value = "/{id}")
-    public String delete(@PathVariable(value = "id") Long id){
+    public ResponseEntity<String> delete(@PathVariable(value = "id") Long id){
         return rentalService.delete(id);
     }
 
     @GetMapping(value = "/available")
-    public List<String> available(){
+    public ResponseEntity<List<String>> available(){
         return rentalService.availableBooks();
     }
 
 
     @PutMapping(value = "/{id}/extend")
-    public String extendEndDate(@PathVariable(value = "id")Long id){
+    public ResponseEntity<String> extendEndDate(@PathVariable(value = "id")Long id){
        return rentalService.extend(id);
     }
 }

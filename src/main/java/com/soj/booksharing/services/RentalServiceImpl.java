@@ -8,15 +8,15 @@ import com.soj.booksharing.entity.User;
 import com.soj.booksharing.repository.BooksRepository;
 import com.soj.booksharing.repository.RentalRepository;
 import com.soj.booksharing.repository.UserRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class RentalServiceImpl implements RentalService {
@@ -32,58 +32,62 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
-    public List<RentedBook> fetchAll() {
-        return rentalRepository.findAll();
+    public ResponseEntity<List<RentedBook>> fetchAll() {
+        return ResponseEntity.ok(rentalRepository.findAll());
     }
 
     @Override
-    public RentedBook fetchById(Long id) {
-        return rentalRepository.findById(id).get();
+    public ResponseEntity<RentedBook> fetchById(Long id) {
+
+        if (rentalRepository.findById(id).isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.ok(rentalRepository.findById(id).get());
     }
 
     @Override
-    public String addNew(RentedBook rentedBook) {
+    public ResponseEntity<String> addNew(RentedBook rentedBook) {
         rentalRepository.save(rentedBook);
-        return "You have successfully rented a book!";
+        return ResponseEntity.ok("You have successfully rented a book!");
     }
 
 
     @Override
-    public String update(RentedBook rentedBook, Long id) {
+    public ResponseEntity<String> update(RentedBook rentedBook, Long id) {
         return null;
     }
 
     @Override
-    public String delete(Long id) {
+    public ResponseEntity<String> delete(Long id) {
         rentalRepository.delete(rentalRepository.findById(id).get());
-        return "Rent ended successfully";
+        return ResponseEntity.ok("Rent ended successfully");
     }
 
     @Override
-    public List<String> availableBooks() {
+    public ResponseEntity<List<String>> availableBooks() {
         List<String> toReturn = new ArrayList<>();
 
-        for (Book b : booksRepository.findAll()){
-            if(RentalUtils.checkIfAvailable(b.getId(),booksRepository,rentalRepository)){
+        for (Book b : booksRepository.findAll()) {
+            if (RentalUtils.checkIfAvailable(b.getId(), booksRepository, rentalRepository)) {
                 toReturn.add(StringFormatters.availableBook(b));
             }
         }
-        return toReturn;
+        return ResponseEntity.ok(toReturn);
     }
 
     @Override
-    public String extend(Long id) {
+    public ResponseEntity<String> extend(Long id) {
         RentedBook toBeUpdated = rentalRepository.findById(id).get();
 
-        if (!toBeUpdated.getWasExtended()){
+        if (!toBeUpdated.getWasExtended()) {
             toBeUpdated.setWasExtended(true);
             LocalDate currentEndDatePlusOneWeek = toBeUpdated.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().plusWeeks(1);
             toBeUpdated.setEndDate(Date.from(currentEndDatePlusOneWeek.atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
             rentalRepository.save(toBeUpdated);
-            return StringFormatters.rentalExtended(id);
-        }else{
-            return StringFormatters.rentalFailed();
+            return ResponseEntity.ok(StringFormatters.rentalExtended(id));
+        } else {
+            return ResponseEntity.ok(StringFormatters.rentalFailed());
         }
 
     }
