@@ -20,8 +20,8 @@ public class UserUtils {
             toBeUpdated.setSurname(user.getSurname());
         }
 
-        if (Objects.nonNull(user.getUser()) && !"".equalsIgnoreCase(user.getUser())) {
-            toBeUpdated.setUser(user.getUser());
+        if (Objects.nonNull(user.getUsername()) && !"".equalsIgnoreCase(user.getUsername())) {
+            toBeUpdated.setUser(user.getUsername());
         }
 
         if (Objects.nonNull(user.getEmail()) && !"".equalsIgnoreCase(user.getEmail())) {

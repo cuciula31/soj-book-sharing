@@ -1,6 +1,5 @@
 package com.soj.booksharing.services;
 
-import com.soj.booksharing.dao.UserDAO;
 import com.soj.booksharing.data.*;
 import com.soj.booksharing.entity.Book;
 import com.soj.booksharing.entity.RentedBook;

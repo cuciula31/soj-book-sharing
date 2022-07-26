@@ -2,20 +2,16 @@ package com.soj.booksharing.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.sun.istack.NotNull;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 //@JsonIgnoreProperties({"hibernateLazyInitializer"})
-public class User {
+public class User implements UserDetails {
 
     public User() {
     }
@@ -36,7 +32,7 @@ public class User {
     private String surname;
     @Size(min = 2, max = 10, message = "Username length must be between 2 (min) and 10 (max)")
     private String userName;
-    @Size(min = 7, max = 30, message = "Surname length must be between 2 (min) and 30 (max)")
+    @Size(min = 7, max = 200, message = "Surname length must be between 2 (min) and 30 (max)")
     private String password;
     @Size(min = 5, max = 30, message = "Email length must be between 5 (min) and 30 (max)")
     private String email;
@@ -56,6 +52,10 @@ public class User {
     @OneToMany(targetEntity = Wishlist.class, mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnoreProperties("user")
     Set<Wishlist> wishlist = new HashSet<>();
+
+    @OneToMany
+    @JsonIgnoreProperties("user")
+    List<Authority> authorities = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -80,8 +80,8 @@ public class User {
     public void setSurname(String surname) {
         this.surname = surname;
     }
-
-    public String getUser() {
+    @Override
+    public String getUsername() {
         return userName;
     }
 
@@ -89,8 +89,34 @@ public class User {
         this.userName = user;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new Authority("BASIC_USER"));
+    }
+
+    @Override
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 
     public void setPassword(String password) {
@@ -106,7 +132,7 @@ public class User {
         this.email = email;
     }
 
-    public String getUserName() {
+    public String getusername() {
         return userName;
     }
 
