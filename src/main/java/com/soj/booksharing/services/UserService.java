@@ -17,7 +17,7 @@ public interface UserService {
     ResponseEntity<List<User>> fetchAllUsers();
     ResponseEntity<String> deleteUser(Long id);
     ResponseEntity<String> update(User user,Long id);
-    ResponseEntity<String> add(User user);
+    ResponseEntity<User> add(User user);
     ResponseEntity<String> addExistingBook(Long userId, Long bookId);
     ResponseEntity<String> addRental(Long userId, Long bookId, Integer rentInterval);
     ResponseEntity<String> addNewBook(Book book, Long userId);

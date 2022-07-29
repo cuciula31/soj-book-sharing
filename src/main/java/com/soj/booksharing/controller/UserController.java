@@ -1,26 +1,45 @@
 package com.soj.booksharing.controller;
 
+import com.soj.booksharing.data.JwtUtil;
+import com.soj.booksharing.entity.Authority;
 import com.soj.booksharing.entity.Book;
 import com.soj.booksharing.entity.User;
 import com.soj.booksharing.entity.Wishlist;
 import com.soj.booksharing.exception.ExceptionHandling;
+import com.soj.booksharing.repository.AuthorityRepository;
+import com.soj.booksharing.repository.UserRepository;
 import com.soj.booksharing.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
+import org.springframework.security.authentication.AuthenticationManager;
+
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = "/users")
+@RequestMapping(value = "/api/users")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:8080"}, allowCredentials = "true")
 public class UserController {
 
     private final UserService userService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private JwtUtil jwtUtil;
+    @Autowired
+    private UserRepository repository;
+    @Autowired
+    private AuthorityRepository authorityRepository;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -41,10 +60,22 @@ public class UserController {
         return userService.deleteUser(id);
     }
 
-    @PostMapping
-    public ResponseEntity<String> add(@Valid @RequestBody User user){
-       return userService.add(user);
-    }
+//    @PostMapping(value = "/register")
+//    public ResponseEntity<?> add(@RequestBody User user){
+//        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+//        String encryptedPassword = passwordEncoder.encode(user.getPassword());
+//        user.setPassword(encryptedPassword);
+//        repository.save(user);
+//
+//        Authority authority = new Authority();
+//        authority.setAuthority("BASIC_USER");
+//        authority.setUser(user);
+//
+//        authorityRepository.save(authority);
+//
+//
+//
+//    }
 
     @PutMapping(value = "/{id}")
     public ResponseEntity<String> update(@RequestBody User user ,@PathVariable("id") Long id){

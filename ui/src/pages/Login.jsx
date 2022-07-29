@@ -1,10 +1,12 @@
-import React from "react";
-
+import React, {useState} from "react";
+import { useUser } from "../util/userProvider";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { ButtonGroup } from "@mui/material";
 import styled from "styled-components";
 import '../css/login.css';
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 
 
@@ -64,6 +66,46 @@ const loginButtonSx = {
   };
 
 function Login(){
+
+  const user = useUser();
+  const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMsg, setErrorMsg] = useState(null);
+
+  function sendLoginRequest() {
+    setErrorMsg("");
+    const reqBody = {
+      username: username,
+      password: password,
+    };
+
+    fetch("api/auth/login", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "post",
+      body: JSON.stringify(reqBody),
+    })
+      .then((response) => {
+        if (response.status === 200) return response.text();
+        else if (response.status === 401 || response.status === 403) {
+          setErrorMsg("Invalid username or password");
+        } else {
+          setErrorMsg(
+            "Something went wrong!"
+          );
+        }
+      })
+      .then((data) => {
+        if (data) {
+          Cookies.set("user", data);
+          user.setJwt(data);
+          navigate("/home");
+        }
+      });
+  }
+
     return (
     
     <div id="pageContainer">
@@ -74,10 +116,37 @@ function Login(){
         </div>
         <div id="fieldsContainer">
         
-            <StyledTextField id="user"  label="Username" variant="outlined" required  sx={{left: "15%", top: "30%", width: "70%",position:"absolute"}}  />
-            <StyledTextField id="password" label="Password" variant="outlined" type={"password"} required hidden sx={{left: "15%", top: "40%", width: "70%",position:"absolute"}}  />
+            <StyledTextField value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                 id="user"  
+                 label="Username" 
+                 variant="outlined" 
+                 required  
+                 sx={
+                  {
+                    left: "15%", 
+                    top: "30%", 
+                    width: "70%",
+                    position:"absolute"
+                    }}/>
+            <StyledTextField 
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            id="password" 
+            label="Password" 
+            ariant="outlined" 
+            type={"password"} 
+            required 
+            hidden 
+            sx={
+              {
+                left: "15%", 
+                top: "40%", 
+                width: "70%",
+                position:"absolute"
+                }}  />
             <ButtonGroup variant="contained">
-            <Button variant="contained" sx={loginButtonSx}>Log in
+            <Button variant="contained" sx={loginButtonSx} onClick={() => sendLoginRequest()} >Log in
             </Button> 
             <Button href="/register" variant="contained" sx={registerButtonSx}>Register</Button>
             </ButtonGroup>

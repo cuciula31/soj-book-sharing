@@ -1,16 +1,17 @@
 package com.soj.booksharing.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.*;
 
 @Entity
-//@JsonIgnoreProperties({"hibernateLazyInitializer"})
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:8080"}, allowCredentials = "true")
 public class User implements UserDetails {
 
     public User() {
@@ -31,6 +32,7 @@ public class User implements UserDetails {
     @Size(min = 2, max = 30, message = "Surname length must be between 2 (min) and 30 (max)")
     private String surname;
     @Size(min = 2, max = 10, message = "Username length must be between 2 (min) and 10 (max)")
+    @JsonIgnore
     private String userName;
     @Size(min = 7, max = 200, message = "Surname length must be between 2 (min) and 30 (max)")
     private String password;
@@ -53,7 +55,7 @@ public class User implements UserDetails {
     @JsonIgnoreProperties("user")
     Set<Wishlist> wishlist = new HashSet<>();
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
     @JsonIgnoreProperties("user")
     List<Authority> authorities = new ArrayList<>();
 
@@ -85,13 +87,15 @@ public class User implements UserDetails {
         return userName;
     }
 
-    public void setUser(String user) {
-        this.userName = user;
-    }
+
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new Authority("BASIC_USER"));
+    public List<Authority> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(List<Authority> authorities) {
+        this.authorities = authorities;
     }
 
     @Override
@@ -132,11 +136,7 @@ public class User implements UserDetails {
         this.email = email;
     }
 
-    public String getusername() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
+    public void setUsername(String userName) {
         this.userName = userName;
     }
 

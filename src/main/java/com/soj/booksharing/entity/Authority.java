@@ -1,5 +1,6 @@
 package com.soj.booksharing.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
@@ -17,7 +18,7 @@ public class Authority implements GrantedAuthority {
     private Long id;
     private String authority;
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     public Long getId() {
@@ -30,7 +31,7 @@ public class Authority implements GrantedAuthority {
 
     @Override
     public String getAuthority() {
-        return null;
+        return this.authority;
     }
 
     public void setAuthority(String authority) {

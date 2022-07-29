@@ -1,16 +1,18 @@
 package com.soj.booksharing.services;
 
 import com.soj.booksharing.data.*;
-import com.soj.booksharing.entity.Book;
-import com.soj.booksharing.entity.RentedBook;
-import com.soj.booksharing.entity.User;
-import com.soj.booksharing.entity.Wishlist;
-import com.soj.booksharing.repository.BooksRepository;
-import com.soj.booksharing.repository.RentalRepository;
-import com.soj.booksharing.repository.UserRepository;
-import com.soj.booksharing.repository.WishlistRepository;
+import com.soj.booksharing.entity.*;
+import com.soj.booksharing.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
@@ -27,12 +29,19 @@ public class UserServiceImpl implements UserService {
     private final BooksRepository booksRepository;
     private final RentalRepository rentalRepository;
     private final WishlistRepository wishlistRepository;
+    private final AuthorityRepository authorityRepository;
 
-    public UserServiceImpl(UserRepository repository, BooksRepository booksRepository, RentalRepository rentalRepository, WishlistRepository wishlistRepository) {
+    @Autowired
+    private JwtUtil jwtUtil;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    public UserServiceImpl(UserRepository repository, BooksRepository booksRepository, RentalRepository rentalRepository, WishlistRepository wishlistRepository, AuthorityRepository authorityRepository) {
         this.repository = repository;
         this.booksRepository = booksRepository;
         this.rentalRepository = rentalRepository;
         this.wishlistRepository = wishlistRepository;
+        this.authorityRepository = authorityRepository;
     }
 
     @Override
@@ -74,9 +83,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<String> add(User user) {
-        repository.save(user);
-        return ResponseEntity.ok(StringFormatters.userAdded(user.getId()));
+    public ResponseEntity<User> add(User user) {
+        return null;
     }
 
     @Override

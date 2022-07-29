@@ -21,7 +21,7 @@ public class UserUtils {
         }
 
         if (Objects.nonNull(user.getUsername()) && !"".equalsIgnoreCase(user.getUsername())) {
-            toBeUpdated.setUser(user.getUsername());
+            toBeUpdated.setUsername(user.getUsername());
         }
 
         if (Objects.nonNull(user.getEmail()) && !"".equalsIgnoreCase(user.getEmail())) {
