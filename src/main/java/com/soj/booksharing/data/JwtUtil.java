@@ -1,6 +1,7 @@
 package com.soj.booksharing.data;
 
 
+import com.soj.booksharing.entity.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,6 +10,8 @@ import org.springframework.stereotype.Component;
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -52,12 +55,21 @@ public class JwtUtil implements Serializable {
         return false;
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(User userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        return doGenerateToken(claims, userDetails.getUsername(), userDetails.getAuthorities());
+        claims.put("authorities", userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
+        claims.put("name" , userDetails.getName());
+        claims.put("surname", userDetails.getSurname());
+        return doGenerateToken(claims, userDetails.getUsername());
     }
 
-    private String doGenerateToken(Map<String, Object> claims, String subject, Collection<? extends GrantedAuthority> authorities) {
+    private String doGenerateToken(Map<String, Object> claims, String subject) {
+        claims.forEach((k,v)->{
+            System.out.println(k + " " + v);
+        });
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000)).signWith(SignatureAlgorithm.HS512, secret).compact();
     }

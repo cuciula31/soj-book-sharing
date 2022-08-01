@@ -100,11 +100,12 @@ function Login(){
       .then((data) => {
         if (data) {
           Cookies.set("user", data);
-          user.setJwt(data);
           navigate("/home");
         }
       });
   }
+
+
 
     return (
     
@@ -156,6 +157,5 @@ function Login(){
         </div>
     </div>
     );
-}
-
+              };
 export default Login;
