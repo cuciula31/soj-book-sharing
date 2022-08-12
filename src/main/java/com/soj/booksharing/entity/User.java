@@ -11,7 +11,6 @@ import javax.validation.constraints.Size;
 import java.util.*;
 
 @Entity
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:8080"}, allowCredentials = "true")
 public class User implements UserDetails {
 
     public User() {
@@ -31,7 +30,7 @@ public class User implements UserDetails {
     private String name;
     @Size(min = 2, max = 30, message = "Surname length must be between 2 (min) and 30 (max)")
     private String surname;
-    @Size(min = 2, max = 10, message = "Username length must be between 2 (min) and 10 (max)")
+    @Size(min = 2, max = 30, message = "Username length must be between 2 (min) and 10 (max)")
     @JsonIgnore
     private String userName;
     @Size(min = 7, max = 200, message = "Surname length must be between 2 (min) and 30 (max)")
@@ -144,25 +143,16 @@ public class User implements UserDetails {
         return ownedBooks;
     }
 
-    public void setOwnedBooks(List<Book> ownedBooks) {
-        this.ownedBooks = ownedBooks;
-    }
 
     public Set<RentedBook> getRentedBooks() {
         return rentedBooks;
     }
 
-    public void setRentedBooks(Set<RentedBook> rentedBooks) {
-        this.rentedBooks = rentedBooks;
-    }
 
     public Set<RentedBook> getRentedTo() {
         return rentedTo;
     }
 
-    public void setRentedTo(Set<RentedBook> rentedTo) {
-        this.rentedTo = rentedTo;
-    }
 
     public Set<Wishlist> getWishlist() {
         return wishlist;

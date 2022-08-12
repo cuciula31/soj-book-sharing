@@ -24,6 +24,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private UserDetailsServiceImpl userDetailsService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     @Autowired
     private JwtFilter jwtFilter;
 
@@ -55,7 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/auth/**").permitAll()
                 .antMatchers("/api/auth/register").permitAll()
                 .antMatchers("/api/users/**").permitAll()
-                .anyRequest().authenticated();
+                .anyRequest().permitAll();
 //        http.authorizeRequests()
 //                .anyRequest().permitAll();
 

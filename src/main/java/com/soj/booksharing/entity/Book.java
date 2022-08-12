@@ -31,6 +31,14 @@ public class Book {
     @Size(min = 2, max = 30, message = "Book author length must be between 2 (min) and 30 (max)")
     private String author;
 
+    @Column(name = "category")
+    private String category;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column
+    private String thumb;
     @ManyToMany()
     @JoinTable(name = "book_owner",
             joinColumns = @JoinColumn(name = "book_id", referencedColumnName = "id"),
@@ -93,5 +101,29 @@ public class Book {
 
     public void setWishlist(List<Wishlist> wishlist) {
         this.wishlist = wishlist;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getThumb() {
+        return thumb;
+    }
+
+    public void setThumb(String thumb) {
+        this.thumb = thumb;
     }
 }

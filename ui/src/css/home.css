@@ -1,40 +1,52 @@
-.body{
-    width: 100vw;
-}
 
 #homeContainer{
     position: relative;
+    flex-flow: column;
     background-color:black;
-    height: 100vh;
-    width: 100%;
-    position: relative;
+    min-height: fit-content;
+    width: 100vw;
 }
+
+
 
 #greetingContainer{
+    position: relative;
     width: 100%;
     height: 100vh;
+    z-index: 11
+    ;
 }
 
-@keyframes photoFadeIn {
+@keyframes greetingFade {
     0%{
         opacity: 0%;
     }
     100% {
-        opacity: 50%;
+        opacity: 40%;
     }
 }
 
 #greetingPhotoContainer{
-    position: fixed;
+    position: absolute;
     height: 100%;
     width: 100%;
-    background: url('../drawable/book_collection.jpg');
+    background: url('../drawable/gotham.jpg') center no-repeat;
+    background-size: cover;
     z-index: 1;
-    opacity: 50%;
-    animation-name: photoFadeIn;
+    opacity: 40%;
+    animation-name: greetingFade;
      animation-duration: 5s;
-
 }
+
+/* #greetingPhotoBlurContainer{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: black;
+    opacity: 75%;
+    z-index: 2;
+    top: 0%;
+} */
 
 #blindPickContainer{
     position: relative;
@@ -44,26 +56,19 @@
     z-index: 2;
 }
 
-#greetingPhotoBlurContainer{
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    background-color: black;
-    opacity: 75%;
-    z-index: 2;
-    top: 0%;
-}
+
 
 #greetingText{
     position: absolute;
-    height: 100%;
-    width: 100%;
-    left: 25%;
-    color: white;
+    height: fit-content;
+    width: 50%;
+    right: 12%;
+    color: rgb(253, 255, 223);
+    filter: drop-shadow( 0 0 5rem #b9b9b9);
     z-index: 3;
-    top: 40%;
-    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    top: 20%;
     font-size: 50px;
+    font-family: Stencil, fantasy;
 }
 
 #seeABookContainer{
@@ -92,6 +97,13 @@
     top: 25%;
 }
 
+#greetingCarouselContainer{
+    position: absolute;
+    width: 100%;
+    z-index: 11;
+    bottom: 15%;
+}
+
 #topPicsText{
     position: absolute;
     width: 100%;
@@ -103,9 +115,16 @@
     top: 62%;
 }
 
-#topPicsContainer{
+#topPicsCarousel{
     position: absolute;
-    width: 100vw;
+    width: 100%;
+    height: 25%;
+    top: 70%;
+}
+
+#topPicsContainer{
+     position: absolute;
+    width: 100%;
     height: 25%;
     top: 70%;
 }
@@ -121,7 +140,7 @@
 }
 
 #containerBackground{
-    width: 100vw;
+    width: 100%;
     height: 100%;
     display: flex;
     flex-flow: row nowrap;
@@ -148,12 +167,4 @@
     z-index: 11;
     top: 35%;
     left: 19%;
-}
-
-#carousel{
-    position: relative;
-    width: 100%;
-    height: 100%;
-    top: 15%;
-    z-index: 16;
 }

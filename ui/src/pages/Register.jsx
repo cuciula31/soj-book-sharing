@@ -61,6 +61,14 @@ function Register(){
   const [email, setEmail] = useState("");
   var error = useState("");
 
+  function checkIfUserOrEmailAlreadyExists(){
+    
+  }
+  
+  function checkFields(){
+
+  }
+
   function sendLoginRequest() {
   
    

@@ -3,16 +3,8 @@ package com.soj.booksharing.services;
 import com.soj.booksharing.data.*;
 import com.soj.booksharing.entity.*;
 import com.soj.booksharing.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
@@ -29,19 +21,14 @@ public class UserServiceImpl implements UserService {
     private final BooksRepository booksRepository;
     private final RentalRepository rentalRepository;
     private final WishlistRepository wishlistRepository;
-    private final AuthorityRepository authorityRepository;
 
-    @Autowired
-    private JwtUtil jwtUtil;
-    @Autowired
-    private AuthenticationManager authenticationManager;
 
-    public UserServiceImpl(UserRepository repository, BooksRepository booksRepository, RentalRepository rentalRepository, WishlistRepository wishlistRepository, AuthorityRepository authorityRepository) {
+    public UserServiceImpl(UserRepository repository, BooksRepository booksRepository, RentalRepository rentalRepository, WishlistRepository wishlistRepository) {
         this.repository = repository;
         this.booksRepository = booksRepository;
         this.rentalRepository = rentalRepository;
         this.wishlistRepository = wishlistRepository;
-        this.authorityRepository = authorityRepository;
+
     }
 
     @Override
@@ -113,18 +100,25 @@ public class UserServiceImpl implements UserService {
 
         User user = fetchUser(userId).getBody();
 
-        if (booksRepository.findAll().stream().anyMatch(b -> b.getBookTitle().equals(book.getBookTitle()))) {
-            Book existentBook = booksRepository.findAll().stream()
-                    .filter(b -> b.getBookTitle().equals(book.getBookTitle()))
-                    .findFirst().get(); //If book already found by stream is not necessary to verify ifPresent
-            existentBook.getUsers().add(user);
-            user.getOwnedBooks().add(existentBook);
-            booksRepository.save(existentBook);
-        } else {
-            book.getUsers().add(user);
-            user.getOwnedBooks().add(book);
-            booksRepository.save(book);
-        }
+      //if (!booksRepository.findAll().isEmpty()){
+            if (booksRepository.findAll().stream().anyMatch(b -> b.getBookTitle().equals(book.getBookTitle()))) {
+                Book existentBook = booksRepository.findAll().stream()
+                        .filter(b -> b.getBookTitle().equals(book.getBookTitle()))
+                        .findFirst().get(); //If book already found by stream is not necessary to verify ifPresent
+                existentBook.getUsers().add(user);
+                user.getOwnedBooks().add(existentBook);
+                booksRepository.save(existentBook);
+            } else {
+                book.getUsers().add(user);
+                user.getOwnedBooks().add(book);
+                booksRepository.save(book);
+            }
+//        }else{
+//            book.getUsers().add(user);
+//            user.getOwnedBooks().add(book);
+//            booksRepository.save(book);
+//        }
+
 
         repository.save(user);
 

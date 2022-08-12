@@ -60,22 +60,6 @@ public class UserController {
         return userService.deleteUser(id);
     }
 
-//    @PostMapping(value = "/register")
-//    public ResponseEntity<?> add(@RequestBody User user){
-//        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-//        String encryptedPassword = passwordEncoder.encode(user.getPassword());
-//        user.setPassword(encryptedPassword);
-//        repository.save(user);
-//
-//        Authority authority = new Authority();
-//        authority.setAuthority("BASIC_USER");
-//        authority.setUser(user);
-//
-//        authorityRepository.save(authority);
-//
-//
-//
-//    }
 
     @PutMapping(value = "/{id}")
     public ResponseEntity<String> update(@RequestBody User user ,@PathVariable("id") Long id){
