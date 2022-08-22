@@ -1,10 +1,7 @@
 package com.soj.booksharing.controller;
 
 import com.soj.booksharing.data.JwtUtil;
-import com.soj.booksharing.entity.Authority;
-import com.soj.booksharing.entity.Book;
-import com.soj.booksharing.entity.User;
-import com.soj.booksharing.entity.Wishlist;
+import com.soj.booksharing.entity.*;
 import com.soj.booksharing.exception.ExceptionHandling;
 import com.soj.booksharing.repository.AuthorityRepository;
 import com.soj.booksharing.repository.UserRepository;
@@ -81,6 +78,11 @@ public class UserController {
         return userService.addRental(userId, bookId,period);
     }
 
+    @PutMapping(value = "{userId}/books/rent/{bookId}/period/{period}/pending")
+    public ResponseEntity<String> addPending(@PathVariable(name = "userId") Long userId, @PathVariable(name = "bookId")Long bookId, @PathVariable(name = "period")Integer period){
+        return userService.addPending(userId, bookId,period);
+    }
+
     @PutMapping(value = "/{userId}/books/{bookId}")
     public ResponseEntity<String> addExistingBook(@PathVariable("userId") Long userId, @PathVariable("bookId") Long bookId){
         return userService.addExistingBook(userId, bookId);
@@ -94,6 +96,16 @@ public class UserController {
     @GetMapping(value = "/{userId}/books/rented")
     public ResponseEntity<List<String>> rentedBooks(@PathVariable(value = "userId")Long userId){
         return userService.rentedBooksByUser(userId);
+    }
+
+    @GetMapping(value = "/{userId}/books/pending")
+    public ResponseEntity<List<PendingRental>> pendingBooks(@PathVariable(value = "userId")Long userId){
+        return userService.fetchMyPending(userId);
+    }
+
+    @GetMapping(value = "/{userId}/books/userspending")
+    public ResponseEntity<List<PendingRental>> pendingFromUsers(@PathVariable(value = "userId")Long userId){
+        return userService.fetchOthersPending(userId);
     }
 
     @GetMapping(value = "/{userId}/books/whorented")

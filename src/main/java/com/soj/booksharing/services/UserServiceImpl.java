@@ -21,14 +21,16 @@ public class UserServiceImpl implements UserService {
     private final BooksRepository booksRepository;
     private final RentalRepository rentalRepository;
     private final WishlistRepository wishlistRepository;
+    private final PendingRentalRepository pendingRentalRepository;
 
 
-    public UserServiceImpl(UserRepository repository, BooksRepository booksRepository, RentalRepository rentalRepository, WishlistRepository wishlistRepository) {
+    public UserServiceImpl(UserRepository repository, BooksRepository booksRepository, RentalRepository rentalRepository, WishlistRepository wishlistRepository, PendingRentalRepository pendingRentalRepository) {
         this.repository = repository;
         this.booksRepository = booksRepository;
         this.rentalRepository = rentalRepository;
         this.wishlistRepository = wishlistRepository;
 
+        this.pendingRentalRepository = pendingRentalRepository;
     }
 
     @Override
@@ -94,6 +96,11 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.ok(StringFormatters.userUpdated(userId));
     }
 
+    @Override
+    public ResponseEntity<String> addPending(Long userId, Long bookId, Integer rentingPeriod) {
+        return ResponseEntity.ok(RentalUtils.checkAndSavePending(userId, bookId, rentingPeriod, repository, booksRepository, rentalRepository,pendingRentalRepository));
+    }
+
 
     @Override
     public ResponseEntity<String> addNewBook(Book book, Long userId) {
@@ -157,8 +164,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<String> addRental(Long userId, Long bookId, Integer rentingPeriod) {
-        return ResponseEntity.ok(RentalUtils.checkIfSuccess(userId, bookId, rentingPeriod, repository, booksRepository, rentalRepository));
+        return ResponseEntity.ok(RentalUtils.checkAndSaveRental(userId, bookId, rentingPeriod, repository, booksRepository, rentalRepository));
     }
+
+
 
     @Override
     public ResponseEntity<List<Book>> fetchOwnedBooks(Long id) {
@@ -191,6 +200,23 @@ public class UserServiceImpl implements UserService {
         for (RentedBook rentedBook : rentedBooks) {
             toBeReturned.add(StringFormatters.whoRentedFromMe(rentedBook));
         }
+
+        return ResponseEntity.ok(toBeReturned) ;
+    }
+
+    @Override
+    public ResponseEntity<List<PendingRental>> fetchMyPending(Long userId) {
+        List<PendingRental> toBeReturned = new ArrayList<>(fetchUser(userId).getBody().getPendingBooks());
+        return ResponseEntity.ok(toBeReturned);
+    }
+
+    @Override
+    public ResponseEntity<List<PendingRental>> fetchOthersPending(Long userId) {
+        User user = repository.findById(userId).get();
+
+        List<PendingRental> rentedBooks = pendingRentalRepository.findAll().stream().filter(rb -> rb.getRentedFrom().equals(user)).toList();
+
+        List<PendingRental> toBeReturned = new ArrayList<>(rentedBooks);
 
         return ResponseEntity.ok(toBeReturned) ;
     }

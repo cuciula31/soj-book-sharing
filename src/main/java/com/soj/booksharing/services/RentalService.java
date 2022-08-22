@@ -1,5 +1,6 @@
 package com.soj.booksharing.services;
 
+import com.soj.booksharing.entity.PendingRental;
 import com.soj.booksharing.entity.RentedBook;
 import org.springframework.http.ResponseEntity;
 
@@ -15,7 +16,10 @@ public interface RentalService {
     //Read
     ResponseEntity<List<RentedBook>> fetchAll();
 
+    ResponseEntity<List<PendingRental>> fetchAllPending();
+
     ResponseEntity<RentedBook> fetchById(Long id);
+    ResponseEntity<PendingRental> fetchPending();
 
     //Update
     ResponseEntity<String> update(RentedBook rentedBook, Long id);
@@ -26,6 +30,8 @@ public interface RentalService {
     //Read books
 //    List<Book> rentedBooksByUser(Long userId);
     ResponseEntity<List<String>> availableBooks();
+
+    ResponseEntity<Boolean> checkIfBookAvailable(Long bookId);
 
     ResponseEntity<String> extend(Long id);
 }

@@ -1,16 +1,15 @@
 package com.soj.booksharing.data;
 
 import com.soj.booksharing.entity.Book;
+import com.soj.booksharing.entity.PendingRental;
 import com.soj.booksharing.entity.RentedBook;
 import com.soj.booksharing.entity.User;
 import com.soj.booksharing.repository.BooksRepository;
+import com.soj.booksharing.repository.PendingRentalRepository;
 import com.soj.booksharing.repository.RentalRepository;
 import com.soj.booksharing.repository.UserRepository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 public class RentalUtils {
 
@@ -22,12 +21,25 @@ public class RentalUtils {
         book.getRentedBook().add(rentedBook);
     }
 
+    private static void insertRelationsBetweenUserOwnerAndBook(PendingRental pendingRental, User user, User owner, Book book) {
+        user.getPendingBooks().add(pendingRental);
+        owner.getPendingTo().add(pendingRental);
+        book.getPendingRentals().add(pendingRental);
+    }
+
     private static void saveRental(UserRepository repository, BooksRepository booksRepository, RentalRepository rentalRepository, User user, User owner, Book book, RentedBook rentedBook) {
         repository.save(owner);
         booksRepository.save(book);
         rentalRepository.save(rentedBook);
         repository.save(user);
     }
+    private static void savePending(UserRepository repository, BooksRepository booksRepository, PendingRentalRepository pendingRentalRepository, User user, User owner, Book book, PendingRental pendingRental) {
+        repository.save(owner);
+        booksRepository.save(book);
+        pendingRentalRepository.save(pendingRental);
+        repository.save(user);
+    }
+
 
     public static Boolean checkIfAvailableUsersEqualsZero(List<User> availableUsers) {
         return availableUsers.size() == 0;
@@ -46,7 +58,8 @@ public class RentalUtils {
         return StringFormatters.invalidRentingPeriod();
     }
 
-    public static String checkIfSuccess(Long userId, Long bookId, Integer rentingPeriod, UserRepository repository, BooksRepository booksRepository, RentalRepository rentalRepository) {
+    // TODO: 8/18/2022 replace this method adapted to pending, it will be created a temporary method which is similar to this
+    public static String checkAndSaveRental(Long userId, Long bookId, Integer rentingPeriod, UserRepository repository, BooksRepository booksRepository, RentalRepository rentalRepository) {
 
         User user = UserUtils.getUserById(userId, repository);
         Book book = BookUtils.getById(bookId,booksRepository);
@@ -87,6 +100,44 @@ public class RentalUtils {
 
     }
 
+    public static String checkAndSavePending(Long userId, Long bookId, Integer rentingPeriod, UserRepository repository, BooksRepository booksRepository, RentalRepository rentalRepository,PendingRentalRepository pendingRentalRepository){
+        User user = UserUtils.getUserById(userId, repository);
+        Book book = BookUtils.getById(bookId,booksRepository);
+        List<User> availableUsers = book.getUsers();
+        User owner = null;
+
+        if (rentalRepository.findAll().size() > 0) {
+            List<RentedBook> rentalsWithSameBook = rentalRepository.findAll().stream().filter(r -> r.getBook().equals(book)).toList();
+            List<User> ownersThatRentedAlready = rentalsWithSameBook.stream().map(RentedBook::getRentedFrom).toList();
+
+            for (User u : availableUsers){
+                if (!ownersThatRentedAlready.contains(u)){
+                    owner = u;
+                }
+            }
+        } else {
+            owner = availableUsers.get(0);
+        }
+
+        if (owner == null && rentalRepository.findAll().size() > 0) {
+            return availableUsersEqualsZeroAlert(book.getId());
+        } else {
+            if (checkIfRentingPeriodNotInGivenIntervals(rentingPeriod)) {
+                return intervalGreaterThanMaximum();
+            } else {
+                PendingRental pendingRental = new PendingRental(user,
+                        owner,
+                        book,
+                        RentingIntervals.getIntervalsForSpecificPeriod(rentingPeriod).getStartDate(),
+                        RentingIntervals.getIntervalsForSpecificPeriod(rentingPeriod).getEndDate(),
+                        false);
+                RentalUtils.insertRelationsBetweenUserOwnerAndBook(pendingRental, user, owner, book);
+                RentalUtils.savePending(repository, booksRepository, pendingRentalRepository, user, owner, book, pendingRental);
+                return "You have rented successfully a book!";
+            }
+        }
+
+    }
 
     public static Boolean checkIfAvailable(Long bookId, BooksRepository booksRepository, RentalRepository rentalRepository){
         Book book = BookUtils.getById(bookId,booksRepository);
@@ -106,10 +157,6 @@ public class RentalUtils {
             owner = availableUsers.get(0);
         }
 
-        if (owner == null && rentalRepository.findAll().size() > 0) {
-            return false;
-        } else {
-                return true;
-        }
+        return owner != null || rentalRepository.findAll().size() <= 0;
     }
 }

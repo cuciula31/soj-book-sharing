@@ -50,6 +50,14 @@ public class User implements UserDetails {
     @JsonIgnoreProperties({"users", "rentedFrom", "rentedBook"})
     Set<RentedBook> rentedTo = new HashSet<>();
 
+    @OneToMany(targetEntity = PendingRental.class, mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("user")
+    Set<PendingRental> pendingBooks;
+
+    @OneToMany(targetEntity = PendingRental.class, mappedBy = "rentedFrom", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"users", "rentedFrom", "rentedBook"})
+    Set<PendingRental> pendingTo = new HashSet<>();
+
     @OneToMany(targetEntity = Wishlist.class, mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnoreProperties("user")
     Set<Wishlist> wishlist = new HashSet<>();
@@ -160,5 +168,41 @@ public class User implements UserDetails {
 
     public void setWishlist(Set<Wishlist> wishlist) {
         this.wishlist = wishlist;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setOwnedBooks(List<Book> ownedBooks) {
+        this.ownedBooks = ownedBooks;
+    }
+
+    public void setRentedBooks(Set<RentedBook> rentedBooks) {
+        this.rentedBooks = rentedBooks;
+    }
+
+    public void setRentedTo(Set<RentedBook> rentedTo) {
+        this.rentedTo = rentedTo;
+    }
+
+    public Set<PendingRental> getPendingBooks() {
+        return pendingBooks;
+    }
+
+    public void setPendingBooks(Set<PendingRental> pendingBooks) {
+        this.pendingBooks = pendingBooks;
+    }
+
+    public Set<PendingRental> getPendingTo() {
+        return pendingTo;
+    }
+
+    public void setPendingTo(Set<PendingRental> pendingTo) {
+        this.pendingTo = pendingTo;
     }
 }

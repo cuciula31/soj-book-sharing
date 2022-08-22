@@ -2,9 +2,10 @@ package com.soj.booksharing.services;
 
 import com.soj.booksharing.data.*;
 import com.soj.booksharing.entity.Book;
+import com.soj.booksharing.entity.PendingRental;
 import com.soj.booksharing.entity.RentedBook;
-import com.soj.booksharing.entity.User;
 import com.soj.booksharing.repository.BooksRepository;
+import com.soj.booksharing.repository.PendingRentalRepository;
 import com.soj.booksharing.repository.RentalRepository;
 import com.soj.booksharing.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -23,16 +24,24 @@ public class RentalServiceImpl implements RentalService {
     private final UserRepository repository;
     private final BooksRepository booksRepository;
     private final RentalRepository rentalRepository;
+    private final PendingRentalRepository pendingRental;
 
-    public RentalServiceImpl(UserRepository repository, BooksRepository booksRepository, RentalRepository rentalRepository) {
+    public RentalServiceImpl(UserRepository repository, BooksRepository booksRepository, RentalRepository rentalRepository, PendingRentalRepository pendingRental) {
         this.repository = repository;
         this.booksRepository = booksRepository;
         this.rentalRepository = rentalRepository;
+        this.pendingRental = pendingRental;
     }
 
+    // TODO: 8/18/2022 finish rental service implementation for pending
     @Override
     public ResponseEntity<List<RentedBook>> fetchAll() {
         return ResponseEntity.ok(rentalRepository.findAll());
+    }
+
+    @Override
+    public ResponseEntity<List<PendingRental>> fetchAllPending() {
+        return null;
     }
 
     @Override
@@ -42,6 +51,11 @@ public class RentalServiceImpl implements RentalService {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.ok(rentalRepository.findById(id).get());
+    }
+
+    @Override
+    public ResponseEntity<PendingRental> fetchPending() {
+        return null;
     }
 
     @Override
@@ -72,6 +86,11 @@ public class RentalServiceImpl implements RentalService {
             }
         }
         return ResponseEntity.ok(toReturn);
+    }
+
+    @Override
+    public ResponseEntity<Boolean> checkIfBookAvailable(Long bookId) {
+      return ResponseEntity.ok(RentalUtils.checkIfAvailable(bookId,booksRepository,rentalRepository));
     }
 
     @Override

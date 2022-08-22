@@ -12,8 +12,8 @@ import AddNewBook from "./pages/AddNewBook";
 import jwt from "jwt-decode";
 import Cookies from "js-cookie";
 import MyRentals from "./pages/MyRentals";
-import { Explore } from "@mui/icons-material";
 import Explorer from "./pages/Explorer";
+import MyBook from "./pages/MyBook";
 
 // import Contact from './pages/contact';
 
@@ -72,6 +72,12 @@ function App() {
         exact
         path="/explore"
         element={roles[0] === "BASIC_USER" ? <Explorer /> : <Welcome />}
+      />
+
+      <Route
+        exact
+        path="/mybook"
+        element={roles[0] === "BASIC_USER" ? <MyBook/> : <Welcome />}
       />
 
       <Route exact path="/welcome" element={<Welcome />} />

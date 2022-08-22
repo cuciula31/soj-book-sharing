@@ -51,6 +51,10 @@ public class Book {
     @JsonIgnoreProperties({"users", "rentedFrom","rentedBook", "book"})
     private List<RentedBook> rentedBook = new ArrayList<>();
 
+    @OneToMany(targetEntity = RentedBook.class, mappedBy = "book")
+    @JsonIgnoreProperties({"users", "rentedFrom","pendingBook", "book"})
+    private List<PendingRental> pendingRentals = new ArrayList<>();
+
     @OneToMany(targetEntity = Wishlist.class, mappedBy = "book")
     @JsonIgnoreProperties("book")
     private List<Wishlist> wishlist = new ArrayList<>();
@@ -117,6 +121,14 @@ public class Book {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<PendingRental> getPendingRentals() {
+        return pendingRentals;
+    }
+
+    public void setPendingRentals(List<PendingRental> pendingRentals) {
+        this.pendingRentals = pendingRentals;
     }
 
     public String getThumb() {
