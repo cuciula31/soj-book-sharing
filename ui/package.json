@@ -5,6 +5,7 @@
   "proxy": "http://localhost:8080",
   "start": "react-scripts --expose-gc --max_old_space_size=12000 start",
   "dependencies": {
+    "@chatscope/chat-ui-kit-react": "^1.9.7",
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
     "@mui/icons-material": "^5.8.4",

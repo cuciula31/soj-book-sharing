@@ -77,6 +77,12 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
+    public ResponseEntity<String> deletePending(Long id){
+        pendingRental.delete(pendingRental.findById(id).get());
+        return ResponseEntity.ok("Pending deleted successfully");
+    }
+
+    @Override
     public ResponseEntity<List<String>> availableBooks() {
         List<String> toReturn = new ArrayList<>();
 

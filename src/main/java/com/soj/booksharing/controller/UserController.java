@@ -94,7 +94,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/{userId}/books/rented")
-    public ResponseEntity<List<String>> rentedBooks(@PathVariable(value = "userId")Long userId){
+    public ResponseEntity<List<RentedBook>> rentedBooks(@PathVariable(value = "userId")Long userId){
         return userService.rentedBooksByUser(userId);
     }
 
@@ -109,7 +109,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/{userId}/books/whorented")
-    public ResponseEntity<List<String>> whoRentedFromMe(@PathVariable(value = "userId")Long userId){
+    public ResponseEntity<List<RentedBook>> whoRentedFromMe(@PathVariable(value = "userId")Long userId){
         return userService.whoRentedMyBooks(userId);
     }
 

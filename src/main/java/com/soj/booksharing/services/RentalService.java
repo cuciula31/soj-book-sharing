@@ -27,6 +27,8 @@ public interface RentalService {
     //Delete
     ResponseEntity<String> delete(Long id);
 
+    ResponseEntity<String> deletePending(Long id);
+
     //Read books
 //    List<Book> rentedBooksByUser(Long userId);
     ResponseEntity<List<String>> availableBooks();

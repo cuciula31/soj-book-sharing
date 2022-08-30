@@ -14,6 +14,7 @@ import Cookies from "js-cookie";
 import MyRentals from "./pages/MyRentals";
 import Explorer from "./pages/Explorer";
 import MyBook from "./pages/MyBook";
+import RentalSuccess from "./pages/RentalSuccess";
 
 // import Contact from './pages/contact';
 
@@ -33,15 +34,9 @@ function App() {
     return [];
   }
 
-  console.log(roles);
-
   return (
     <Routes>
-      <Route
-        exact
-        path="/"
-        element={roles[0] === "BASIC_USER" ? <Home /> : <Welcome />}
-      />
+      <Route exact path="/" element={user ? <Home /> : <Welcome />} />
       <Route exact path="/login" element={<Login />} />
       <Route exact path="/register" element={<Register />} />
 
@@ -49,36 +44,30 @@ function App() {
       <Route
         exact
         path="/myaccount"
-        element={roles[0] === "BASIC_USER" ? <MyAccount /> : <Welcome />}
+        element={user ? <MyAccount /> : <Welcome />}
       />
-      <Route
-        exact
-        path="/mybooks"
-        element={roles[0] === "BASIC_USER" ? <MyBooks /> : <Welcome />}
-      />
+      <Route exact path="/mybooks" element={user ? <MyBooks /> : <Welcome />} />
 
       <Route
         exact
         path="/addbook"
-        element={roles[0] === "BASIC_USER" ? <AddNewBook /> : <Welcome />}
+        element={user ? <AddNewBook /> : <Welcome />}
       />
       <Route
         exact
-        path="/myrentals"
-        element={roles[0] === "BASIC_USER" ? <MyRentals /> : <Welcome />}
+        path="/rentals"
+        element={user ? <MyRentals /> : <Welcome />}
       />
 
       <Route
         exact
         path="/explore"
-        element={roles[0] === "BASIC_USER" ? <Explorer /> : <Welcome />}
+        element={user ? <Explorer /> : <Welcome />}
       />
 
-      <Route
-        exact
-        path="/mybook"
-        element={roles[0] === "BASIC_USER" ? <MyBook/> : <Welcome />}
-      />
+      <Route exact path="/mybook" element={user ? <MyBook /> : <Welcome />} />
+
+      <Route exact path="/success" element={user ? <RentalSuccess /> : <Welcome />} />
 
       <Route exact path="/welcome" element={<Welcome />} />
       <Route path="*" element={<NotFound />} />

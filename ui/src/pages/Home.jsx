@@ -1,11 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "../css/home.css";
 import Button from "@mui/material/Button";
-import Cookies from "js-cookie";
-import jwt from "jwt-decode";
 import Navbar from "../navbar/Navbar";
-import ListElement from "../dynamic/ListElement";
-import AliceCarousel from "react-alice-carousel";
 import "react-alice-carousel/lib/alice-carousel.css";
 import FeaturedWeek from "../dynamic/FeaturedWeek.jsx";
 

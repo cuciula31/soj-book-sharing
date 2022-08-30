@@ -20,18 +20,18 @@ public class PendingRental {
 
     @ManyToOne()
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnoreProperties("pendingBooks")
+    @JsonIgnoreProperties({"pendingBooks", "pendingTo"})
     private User user;
 
     @ManyToOne()
     @JoinTable(name = "pending_from",
             joinColumns = @JoinColumn(name = "rental_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
-    @JsonIgnoreProperties({"users", "pendingFrom", "book", "pendingTo"})
-    private User rentedFrom;
+    @JsonIgnoreProperties({"pendingBooks","rentedFrom","pendingRentals", "users" ,"pendingFrom", "book", "pendingTo"})
+    private User pendingFrom;
 
     @ManyToOne
-    @JsonIgnoreProperties({"users", "rentedFrom", "book", "pendingTo"})
+    @JsonIgnoreProperties({"pendingRentals", "pendingFrom", "book", "pendingTo","users","pendingBooks"})
     private Book book;
 
     @Column(name = "start_date")
@@ -48,7 +48,7 @@ public class PendingRental {
 
     public PendingRental(User user, User rentedFrom, Book book, Date startDate, Date endDate, Boolean wasExtended) {
         this.user = user;
-        this.rentedFrom = rentedFrom;
+        this.pendingFrom = rentedFrom;
         this.book = book;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -104,11 +104,11 @@ public class PendingRental {
     }
 
     public User getRentedFrom() {
-        return rentedFrom;
+        return pendingFrom;
     }
 
     public void setRentedFrom(User rentedFrom) {
-        this.rentedFrom = rentedFrom;
+        this.pendingFrom = rentedFrom;
     }
 
 }

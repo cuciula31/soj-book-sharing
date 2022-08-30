@@ -44,7 +44,7 @@ public class Book {
             joinColumns = @JoinColumn(name = "book_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "user_id",referencedColumnName = "id"))
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnoreProperties("ownedBooks")
+    @JsonIgnoreProperties({"ownedBooks","pendingBooks","pendingTo","rentedBooks"})
     private List<User> users = new ArrayList<>();
 
     @OneToMany(targetEntity = RentedBook.class, mappedBy = "book")
@@ -52,7 +52,7 @@ public class Book {
     private List<RentedBook> rentedBook = new ArrayList<>();
 
     @OneToMany(targetEntity = RentedBook.class, mappedBy = "book")
-    @JsonIgnoreProperties({"users", "rentedFrom","pendingBook", "book"})
+    @JsonIgnoreProperties({"users","rentedFrom","pendingBook", "book","ownedBooks"})
     private List<PendingRental> pendingRentals = new ArrayList<>();
 
     @OneToMany(targetEntity = Wishlist.class, mappedBy = "book")

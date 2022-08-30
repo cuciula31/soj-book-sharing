@@ -17,14 +17,14 @@ public class RentedBook {
 
     @ManyToOne()
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnoreProperties("rentedBooks")
+    @JsonIgnoreProperties({"rentedBooks","pendingBooks","rentedTo"})
     private User user;
 
     @ManyToOne()
     @JoinTable(name = "rented_from",
             joinColumns = @JoinColumn(name = "rental_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
-    @JsonIgnoreProperties({"users", "rentedFrom","rentedBook","rentedTo"})
+    @JsonIgnoreProperties({"users", "rentedFrom","rentedBook","rentedTo","pendingRental" })
     private User rentedFrom;
 
     @ManyToOne

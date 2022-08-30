@@ -14,6 +14,7 @@ public class RentalController {
 
     private final RentalService rentalService;
 
+
     public RentalController(RentalService rentalService) {
         this.rentalService = rentalService;
     }
@@ -43,6 +44,10 @@ public class RentalController {
         return rentalService.delete(id);
     }
 
+    @DeleteMapping(value = "/pending/{id}")
+    public ResponseEntity<String>deletePending(@PathVariable(value = "id")Long id){
+        return rentalService.deletePending(id);
+    }
     @GetMapping(value = "/available")
     public ResponseEntity<List<String>> available() {
         return rentalService.availableBooks();

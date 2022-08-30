@@ -39,23 +39,23 @@ public class User implements UserDetails {
     private String email;
 
     @ManyToMany(targetEntity = Book.class, mappedBy = "users", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnoreProperties({"users", "rentedFrom", "rentedBook"})
+    @JsonIgnoreProperties({"users", "rentedFrom", "rentedBook","pendingRentals"})
     List<Book> ownedBooks;
 
     @OneToMany(targetEntity = RentedBook.class, mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnoreProperties("user")
+    @JsonIgnoreProperties({"users", "rentedFrom","pendingBooks"})
     Set<RentedBook> rentedBooks;
 
     @OneToMany(targetEntity = RentedBook.class, mappedBy = "rentedFrom", fetch = FetchType.LAZY)
-    @JsonIgnoreProperties({"users", "rentedFrom", "rentedBook"})
+    @JsonIgnoreProperties({"users", "rentedFrom", "rentedBook","user"})
     Set<RentedBook> rentedTo = new HashSet<>();
 
     @OneToMany(targetEntity = PendingRental.class, mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnoreProperties("user")
+    @JsonIgnoreProperties({"user", "pendingFrom","rentedFrom"})
     Set<PendingRental> pendingBooks;
 
-    @OneToMany(targetEntity = PendingRental.class, mappedBy = "rentedFrom", fetch = FetchType.LAZY)
-    @JsonIgnoreProperties({"users", "rentedFrom", "rentedBook"})
+    @OneToMany(targetEntity = PendingRental.class, mappedBy = "pendingFrom", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"pendingFrom", "rentedBook","user","users","rentedFrom"})
     Set<PendingRental> pendingTo = new HashSet<>();
 
     @OneToMany(targetEntity = Wishlist.class, mappedBy = "user", fetch = FetchType.LAZY)

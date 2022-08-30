@@ -175,11 +175,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<List<String>> rentedBooksByUser(Long id) {
-        List<String> toBeReturned = new ArrayList<>();
-        fetchUser(id).getBody().getRentedBooks().forEach(r -> {
-            toBeReturned.add(StringFormatters.rental(r));
-        });
+    public ResponseEntity<List<RentedBook>> rentedBooksByUser(Long id) {
+        List<RentedBook> toBeReturned = new ArrayList<>();
+        toBeReturned.addAll(fetchUser(id).getBody().getRentedBooks());
         return ResponseEntity.ok(toBeReturned);
     }
 
@@ -191,14 +189,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<List<String>> whoRentedMyBooks(Long userId) {
+    public ResponseEntity<List<RentedBook>> whoRentedMyBooks(Long userId) {
         User user = repository.findById(userId).get();
-        List<String> toBeReturned = new ArrayList<>();
+        List<RentedBook> toBeReturned = new ArrayList<>();
 
         List<RentedBook> rentedBooks = rentalRepository.findAll().stream().filter(rb -> rb.getRentedFrom().equals(user)).toList();
 
         for (RentedBook rentedBook : rentedBooks) {
-            toBeReturned.add(StringFormatters.whoRentedFromMe(rentedBook));
+            toBeReturned.add(rentedBook);
         }
 
         return ResponseEntity.ok(toBeReturned) ;
